@@ -1,0 +1,20 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "xo",
+  "overrides": [
+    {
+      "extends": ["xo-typescript"],
+      "files": ["*.ts", "*.tsx"]
+    }
+  ],
+  "ignorePatterns": ["dist"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "project": "tsconfig.json"
+  },
+  "rules": {}
+}

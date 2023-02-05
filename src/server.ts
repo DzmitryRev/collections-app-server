@@ -1,7 +1,7 @@
-import express from "express";
+import express from 'express';
 
 const app = express();
 
 app.listen(3000, () => {
-  console.log("Server is running");
+	console.log('Server is running');
 });
