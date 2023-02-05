@@ -1,1 +1,9 @@
+# IDE
 .vscode
+
+# App
+node_modules
+dist
+
+# Environment
+.env
