@@ -8,6 +8,12 @@
     {
       "extends": ["xo-typescript"],
       "files": ["*.ts", "*.tsx"]
+    },
+    {
+      "files": ["constants.ts"],
+      "rules": {
+        "@typescript-eslint/naming-convention": "off"
+      }
     }
   ],
   "ignorePatterns": ["dist"],
