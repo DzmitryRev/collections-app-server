@@ -1,3 +1,4 @@
+// Status codes
 export const ACCEPTED = 202;
 export const BAD_GATEWAY = 502;
 export const BAD_REQUEST = 400;
@@ -18,3 +19,6 @@ export const SERVICE_UNAVAILABLE = 503;
 export const TOO_MANY_REQUESTS = 429;
 export const UNAUTHORIZED = 401;
 export const UNPROCESSABLE_ENTITY = 422;
+
+//
+export const DEFAULT_IMAGE = 'default.jpg';
