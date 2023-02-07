@@ -3,16 +3,16 @@
     "browser": true,
     "es2021": true
   },
-  "extends": "xo",
+  "extends": ["airbnb-base"],
   "overrides": [
     {
-      "extends": ["xo-typescript"],
+      "extends": ["airbnb-typescript/base"],
       "files": ["*.ts", "*.tsx"]
     },
     {
-      "files": ["constants.ts"],
+      "files": ["*-const.ts"],
       "rules": {
-        "@typescript-eslint/naming-convention": "off"
+        "import/prefer-default-export": "off"
       }
     }
   ],
@@ -22,5 +22,8 @@
     "sourceType": "module",
     "project": "tsconfig.json"
   },
-  "rules": {}
+  "rules": {
+    "linebreak-style": "off",
+    "class-methods-use-this": "off"
+  }
 }
