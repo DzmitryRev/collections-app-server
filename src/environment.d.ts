@@ -7,6 +7,7 @@ declare global {
       MONGO_DB_URL: string;
       JWT_ACCESS_SECRET: string;
       JWT_REFRESH_SECRET: string;
+      JWT_EMAIL_SECRET: string;
       API_URL: string;
       CLIENT_URL: string;
       CLIENT_SUCCESS_CONFIRM_URL: string;

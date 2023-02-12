@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { type UserType } from './user-model';
+import { UserType } from './user.model';
 
 export type TokenType = {
   user: UserType;

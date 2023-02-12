@@ -1,7 +1,6 @@
 import {
-  Schema, model, type Model, type Document,
+  Schema, model, Model, Document,
 } from 'mongoose';
-import hashService from '../services/hash-service';
 
 export type UserType = {
   photo: string;
@@ -10,7 +9,7 @@ export type UserType = {
   password: string;
   about: string;
   isConfirmed: boolean;
-  activationLink: string;
+  //   activationLink: string;
   isBlocked: boolean;
   isAdmin: boolean;
 };
@@ -25,26 +24,23 @@ type UserMethodsType = {
 } & UserType &
 Document;
 
-type UserModelType = Model<UserMethodsType>;
+export type UserModelType = Model<UserMethodsType>;
 
 const userSchema = new Schema<UserType, UserModelType, UserMethodsType>({
   email: {
-    type: String, unique: true, required: true, trim: true,
+    type: String,
+    unique: true,
+    required: true,
+    trim: true,
   },
   name: { type: String, required: true, trim: true },
   password: { type: String, required: true, minlength: 6 },
   photo: { type: String, default: null },
   about: { type: String, default: '' },
   isConfirmed: { type: Boolean, default: false },
-  activationLink: { type: String },
+  //   activationLink: { type: String },
   isBlocked: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false },
-});
-
-userSchema.pre('save', async function save(next) {
-  const hashedPassword = await hashService.hashPassword(this.password);
-  this.password = hashedPassword;
-  next();
 });
 
 userSchema.methods.transform = function transform() {

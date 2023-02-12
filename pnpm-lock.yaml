@@ -19,13 +19,12 @@ specifiers:
   eslint-config-airbnb-base: ^15.0.0
   eslint-config-airbnb-typescript: ^17.0.0
   eslint-config-standard-with-typescript: ^34.0.0
-  eslint-config-xo: ^0.43.1
-  eslint-config-xo-typescript: ^0.55.1
   eslint-plugin-import: ^2.25.2
   eslint-plugin-n: ^15.0.0
   eslint-plugin-promise: ^6.0.0
   express: ^4.18.2
   express-validator: ^6.14.3
+  http-status: ^1.6.2
   jsonwebtoken: ^9.0.0
   mongoose: ^6.9.0
   nodemailer: ^6.9.1
@@ -40,6 +39,7 @@ dependencies:
   dotenv: 16.0.3
   express: 4.18.2
   express-validator: 6.14.3
+  http-status: 1.6.2
   jsonwebtoken: 9.0.0
   mongoose: 6.9.0
   nodemailer: 6.9.1
@@ -60,8 +60,6 @@ devDependencies:
   eslint-config-airbnb-base: 15.0.0_ohdts44xlqyeyrlje4qnefqeay
   eslint-config-airbnb-typescript: 17.0.0_kh22gsft6r4fkunxdzqyqzlvzy
   eslint-config-standard-with-typescript: 34.0.0_frfgwa7fqjzszldru3sxumpviq
-  eslint-config-xo: 0.43.1_eslint@8.33.0
-  eslint-config-xo-typescript: 0.55.1_cdrceimk7aktdjffnzs56f3q44
   eslint-plugin-import: 2.27.5_ufewo3pl5nnmz6lltvjrdi2hii
   eslint-plugin-n: 15.6.1_eslint@8.33.0
   eslint-plugin-promise: 6.1.1_eslint@8.33.0
@@ -1824,31 +1822,6 @@ packages:
       eslint-plugin-promise: 6.1.1_eslint@8.33.0
     dev: true
 
-  /eslint-config-xo-typescript/0.55.1_cdrceimk7aktdjffnzs56f3q44:
-    resolution: {integrity: sha512-iXua+7n9fOp7LzGzvXlcZG0w6cdtscjASGTrAHMj0Rn9voayxF2oRoMIK1QS6ZJb4fMVEQZdU2D6gTKmWhcCQQ==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      '@typescript-eslint/eslint-plugin': '>=5.43.0'
-      '@typescript-eslint/parser': '>=5.43.0'
-      eslint: '>=8.0.0'
-      typescript: '>=4.4'
-    dependencies:
-      '@typescript-eslint/eslint-plugin': 5.50.0_go4drrxstycfikanvu45pi4vgq
-      '@typescript-eslint/parser': 5.50.0_4vsywjlpuriuw3tl5oq6zy5a64
-      eslint: 8.33.0
-      typescript: 4.9.5
-    dev: true
-
-  /eslint-config-xo/0.43.1_eslint@8.33.0:
-    resolution: {integrity: sha512-azv1L2PysRA0NkZOgbndUpN+581L7wPqkgJOgxxw3hxwXAbJgD6Hqb/SjHRiACifXt/AvxCzE/jIKFAlI7XjvQ==}
-    engines: {node: '>=12'}
-    peerDependencies:
-      eslint: '>=8.27.0'
-    dependencies:
-      confusing-browser-globals: 1.0.11
-      eslint: 8.33.0
-    dev: true
-
   /eslint-import-resolver-node/0.3.7:
     resolution: {integrity: sha512-gozW2blMLJCeFpBwugLTGyvVjNoeo1knonXAcatC6bjPBZitotxdWf7Gimr25N4c0AAOo4eOUfaG82IJPDpqCA==}
     dependencies:
@@ -2431,6 +2404,11 @@ packages:
       setprototypeof: 1.2.0
       statuses: 2.0.1
       toidentifier: 1.0.1
+    dev: false
+
+  /http-status/1.6.2:
+    resolution: {integrity: sha512-oUExvfNckrpTpDazph7kNG8sQi5au3BeTo0idaZFXEhTaJKu7GNJCLHI0rYY2wljm548MSTM+Ljj/c6anqu2zQ==}
+    engines: {node: '>= 0.4.0'}
     dev: false
 
   /https-proxy-agent/5.0.1:

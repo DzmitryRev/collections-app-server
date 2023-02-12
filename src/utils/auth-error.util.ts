@@ -1,5 +1,5 @@
 import { type ValidationError } from 'express-validator';
-import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from '../constants/status-codes-const';
+import httpStatus from 'http-status';
 
 class ApiError extends Error {
   errors: ValidationError[];
@@ -8,7 +8,7 @@ class ApiError extends Error {
 
   constructor(
     message: string,
-    status: number = INTERNAL_SERVER_ERROR,
+    status: number = httpStatus.INTERNAL_SERVER_ERROR,
     errors: ValidationError[] = [],
   ) {
     super(message);
@@ -17,7 +17,7 @@ class ApiError extends Error {
   }
 
   static badRequest(message: string, errors: ValidationError[] = []) {
-    return new ApiError(message, BAD_REQUEST, errors);
+    return new ApiError(message, httpStatus.BAD_REQUEST, errors);
   }
 }
 
