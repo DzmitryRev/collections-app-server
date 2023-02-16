@@ -46,7 +46,7 @@ class TokenService {
   async removeToken(refreshToken: string) {
     const refreshTokenDoc = await Token.findOneAndDelete({ refreshToken });
     if (!refreshTokenDoc) {
-      throw new ApiError('Not found', httpStatus.NOT_FOUND);
+      throw new ApiError('User is already logged out', httpStatus.NOT_FOUND);
     }
   }
 }
