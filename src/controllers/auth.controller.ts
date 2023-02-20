@@ -1,18 +1,26 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  NextFunction, Request, Response, urlencoded,
-} from 'express';
+import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
+import shortid from 'shortid';
 import { COOKIE_AGE, REFRESH_COOKIE_NAME } from '../constants/cookie.const';
-import { SUCCESSFUL_LOGOUT, SUCCESSFUL_REGISTR } from '../constants/success-messages.const';
-import tokenModel from '../models/token.model';
-import User, { UserDtoType, UserModelType } from '../models/user.model';
-import AuthService from '../services/auth.service';
-import HashService from '../services/hash.service';
-import MailService from '../services/mail-service';
-import TokenService from '../services/token.service';
-import UserService from '../services/user.service';
+import { USER_UNAUTH } from '../constants/errors.const';
+import {
+  MESSAGE_SENDED,
+  SUCCESSFUL_LOGOUT,
+  SUCCESSFUL_REGISTR,
+} from '../constants/success-messages.const';
+import {
+  ACCESS_QUERY,
+  ERROR_CONFIRM_URL,
+  PASSWORD_CHANGED,
+  SUCCESS_CONFIRM_URL,
+} from '../constants/client-paths.const';
+import { UserDtoType } from '../models/user.model';
 import SuccessMessage from '../utils/success-message.util';
+import ApiError from '../utils/api-error.util';
+import { HashServiceInstance } from '../modules/hash-module';
+import { UserServiceInstance } from '../modules/user-module';
+import { TokenServiceInstance } from '../modules/token-module';
+import { MailServiceInstance } from '../modules/mail-module';
 
 export const register = async (
   req: Request<{}, {}, { name: string; email: string; password: string }>,
@@ -21,9 +29,10 @@ export const register = async (
 ) => {
   try {
     const { email, name, password } = req.body;
-    const user = await UserService.createUser(email, name, password);
-    const verifyEmailToken = await TokenService.generateVerifyEmailToken(user.transform());
-    await MailService.sendVerificationEmail(email, verifyEmailToken);
+    const hashedPasword = await HashServiceInstance.hashPassword(password);
+    const user = await UserServiceInstance.createUser(email, name, hashedPasword);
+    const verifyEmailToken = TokenServiceInstance.generateVerifyEmailToken(user.transform());
+    await MailServiceInstance.sendVerificationEmail(email, verifyEmailToken);
     res.json(new SuccessMessage(SUCCESSFUL_REGISTR));
   } catch (e) {
     next(e);
@@ -32,20 +41,20 @@ export const register = async (
 
 export const login = async (
   req: Request<{}, {}, { email: string; password: string }>,
-  res: Response<{ userId: UserDtoType; accessToken: string }>,
+  res: Response<{ user: UserDtoType; accessToken: string }>,
   next: NextFunction,
 ) => {
   try {
     const { email, password } = req.body;
-    const user = await UserService.checkAccessToLogin(email);
-    await HashService.checkPassword(user.password, password);
-    const tokens = TokenService.generateAuthTokens(user.transform());
-    await TokenService.saveToken(user.id, tokens.refreshToken);
+    const user = await UserServiceInstance.checkAccessToLogin(email);
+    await HashServiceInstance.checkPassword(user.password, password);
+    const tokens = TokenServiceInstance.generateAuthTokens(user.transform());
+    await TokenServiceInstance.saveTokenInDb(user.id, tokens.refreshToken);
     res.cookie(REFRESH_COOKIE_NAME, tokens.refreshToken, {
       maxAge: COOKIE_AGE,
       httpOnly: true,
     });
-    res.send({ userId: user.transform(), accessToken: tokens.accessToken });
+    res.send({ user: user.transform(), accessToken: tokens.accessToken });
   } catch (e) {
     next(e);
   }
@@ -53,7 +62,7 @@ export const login = async (
 
 export const logout = async (req: Request, res: Response<SuccessMessage>, next: NextFunction) => {
   try {
-    await AuthService.logout(req.cookies[REFRESH_COOKIE_NAME]);
+    await TokenServiceInstance.removeToken(req.cookies[REFRESH_COOKIE_NAME]);
     res.clearCookie(REFRESH_COOKIE_NAME);
     res.json(new SuccessMessage(SUCCESSFUL_LOGOUT));
   } catch (e) {
@@ -63,17 +72,27 @@ export const logout = async (req: Request, res: Response<SuccessMessage>, next: 
 
 export const refreshTokens = async (
   req: Request,
-  res: Response<{ userId: string; accessToken: string }>,
+  res: Response<{ user: UserDtoType; accessToken: string }>,
   next: NextFunction,
 ) => {
   try {
-    const userIdAndTokens = await AuthService.refreshAuth(req.cookies[REFRESH_COOKIE_NAME]);
-    await TokenService.saveToken(userIdAndTokens.userId, userIdAndTokens.refreshToken);
-    res.cookie(REFRESH_COOKIE_NAME, userIdAndTokens.refreshToken, {
+    const refreshToken = req.cookies[REFRESH_COOKIE_NAME];
+    if (!refreshToken) throw new ApiError(USER_UNAUTH, httpStatus.UNAUTHORIZED);
+    const refreshTokenDoc = TokenServiceInstance.checkIsTokenValid(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET,
+    );
+    await TokenServiceInstance.checkTokenInDb(refreshToken);
+    const user = await UserServiceInstance.checkUserInDbById(
+      (refreshTokenDoc.payload as UserDtoType).id,
+    );
+    const newTokens = TokenServiceInstance.generateAuthTokens(user.transform());
+    await TokenServiceInstance.saveTokenInDb(user.id, newTokens.refreshToken);
+    res.cookie(REFRESH_COOKIE_NAME, newTokens.refreshToken, {
       maxAge: COOKIE_AGE,
       httpOnly: true,
     });
-    res.json({ userId: userIdAndTokens.userId, accessToken: userIdAndTokens.accessToken });
+    res.json({ user: user.transform(), accessToken: newTokens.accessToken });
   } catch (e) {
     next(e);
   }
@@ -85,79 +104,56 @@ export const verifyEmail = async (
   next: NextFunction,
 ) => {
   try {
-    await AuthService.verifyEmail(req.params.token);
-    res.redirect('http://localhost:5173/email-confirmed?access=true');
+    const refreshTokenDoc = TokenServiceInstance.checkIsTokenValid(
+      req.params.token,
+      process.env.JWT_EMAIL_SECRET,
+    );
+    await UserServiceInstance.confirmUserEmail((refreshTokenDoc.payload as UserDtoType).id);
+    res.redirect(`${process.env.CLIENT_URL}${SUCCESS_CONFIRM_URL}${ACCESS_QUERY}`);
   } catch (e) {
-    res.redirect('http://localhost:5173/confirmation-error?access=true');
+    res.redirect(`${process.env.CLIENT_URL}${ERROR_CONFIRM_URL}${ACCESS_QUERY}`);
   }
 };
 
 export const checkAccessToChangingPassword = async (
   req: Request<{}, {}, { email: string }>,
-  res: Response<{ userId: string; accessToken: string }>,
+  res: Response<SuccessMessage>,
   next: NextFunction,
 ) => {
   try {
     const { email } = req.body;
-    // 1. Check user exist;
-    // 2. Generate token
-    // 3. Send main with confirm changing
-    // const user = checkUser;
-    // const verifyEmailToken = await TokenService.generateVerifyEmailToken(user.transform());
-    // await MailService.sendAccessToChangingPasswordEmail(email, verifyEmailToken);
-    // res.json(new SuccessMessage(SUCCESSFUL_REGISTR));
+    const user = await UserServiceInstance.checkAccessToLogin(email);
+    const newPassword = shortid.generate();
+    const verifyEmailToken = TokenServiceInstance.generateNewPasswordToken({
+      user: user.transform(),
+      newPassword,
+    });
+    await MailServiceInstance.sendNewPasswordEmail(email, verifyEmailToken, newPassword);
+    res.json(new SuccessMessage(MESSAGE_SENDED));
   } catch (e) {
     next(e);
   }
 };
 
-export const sendNewPassword = async (
+export const confirmNewPassword = async (
   req: Request<{ token: string }>,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    // 1. Verify token from link;
-    // 2. Send password to email with secure link;
-    // 3. Redirect to password sended page
-    // res.redirect('http://localhost:5173/password-sended?access=true');
+    const refreshTokenDoc = TokenServiceInstance.checkIsTokenValid(
+      req.params.token,
+      process.env.JWT_PASSWORD_SECRET,
+    );
+    const newHashedPassword = await HashServiceInstance.hashPassword(
+      refreshTokenDoc.payload.newPassword as string,
+    );
+    await UserServiceInstance.changeUserPassword(
+      (refreshTokenDoc.payload.user as UserDtoType).id,
+      newHashedPassword,
+    );
+    res.redirect(`${process.env.CLIENT_URL}${PASSWORD_CHANGED}${ACCESS_QUERY}`);
   } catch (e) {
-    // res.redirect('http://localhost:5173/confirmation-error?access=true');
-  }
-};
-
-export const ConfirmNewPassword = async (
-  req: Request<{ token: string }>,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    // 1. Verify token from link;
-    // 2. Send password to email with secure link;
-    // 3. Redirect to password changed page
-    // res.redirect('http://localhost:5173/password-changed?access=true');
-  } catch (e) {
-    // res.redirect('http://localhost:5173/confirmation-error?access=true');
-  }
-};
-
-export const get = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const a = await User.find();
-    const t = await tokenModel.find();
-    console.log(t);
-    res.json(a);
-  } catch (e) {
-    next(e);
-  }
-};
-
-export const rem = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    await User.deleteMany();
-    await tokenModel.deleteMany();
-    res.status(httpStatus.NO_CONTENT).send();
-  } catch (e) {
-    next(e);
+    res.redirect(`${process.env.CLIENT_URL}${ERROR_CONFIRM_URL}${ACCESS_QUERY}`);
   }
 };

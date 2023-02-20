@@ -1,4 +1,5 @@
 import nodemailer, { Transporter } from 'nodemailer';
+import { generateNewPasswordMessage, generateVerificationEmailMessage } from './mail.helpers';
 
 class MailService {
   transporter: Transporter;
@@ -25,19 +26,16 @@ class MailService {
   async sendVerificationEmail(to: string, token: string) {
     const subject = 'Email Verification';
     const verificationEmailUrl = `${process.env.API_URL}/api/activate/${token}`;
-    const html = `
-    <div>
-        <h1>Collectory</h1>
-        <h2>Email confirmation</h2>
-        <p>
-            Dear user,  To verify your email, click on this link: <a href="${verificationEmailUrl}">${verificationEmailUrl}</a>
-            If you did not create an account, then ignore this email.
-        </p>
-        
-    </div>
-    `;
+    const html = generateVerificationEmailMessage(verificationEmailUrl);
+    await this.sendEmail(to, subject, html);
+  }
+
+  async sendNewPasswordEmail(to: string, token: string, newPassword: string) {
+    const subject = 'Confirm password changing';
+    const verificationEmailUrl = `${process.env.API_URL}/api/resetPassword/${token}`;
+    const html = generateNewPasswordMessage(verificationEmailUrl, newPassword);
     await this.sendEmail(to, subject, html);
   }
 }
 
-export default new MailService();
+export const MailServiceInstance = new MailService();

@@ -8,7 +8,7 @@ import {
   PASSWORD_TOO_SHORT_MIN_6,
   VALIDATION_ERROR,
 } from '../constants/errors.const';
-import ApiError from '../utils/auth-error.util';
+import ApiError from '../utils/api-error.util';
 
 const validateRequest = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);
@@ -52,5 +52,15 @@ export const validateRegister = [
       min: 6,
     })
     .withMessage(PASSWORD_TOO_SHORT_MIN_6),
+  validateRequest,
+];
+
+export const validateResetPassword = [
+  check('email')
+    .not()
+    .isEmpty()
+    .withMessage(EMAIL_IS_EMPTY)
+    .isEmail()
+    .withMessage(EMAIL_IS_NOT_VALID),
   validateRequest,
 ];

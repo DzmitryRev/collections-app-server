@@ -8,10 +8,9 @@ declare global {
       JWT_ACCESS_SECRET: string;
       JWT_REFRESH_SECRET: string;
       JWT_EMAIL_SECRET: string;
+      JWT_PASSWORD_SECRET: string;
       API_URL: string;
       CLIENT_URL: string;
-      CLIENT_SUCCESS_CONFIRM_URL: string;
-      CLIENT_ERROR_CONFIRM_URL: string;
       GMAIL_USER: string;
       GMAIL_PASSWORD: string;
     }

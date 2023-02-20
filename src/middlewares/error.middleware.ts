@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
-import ApiError from '../utils/auth-error.util';
+import ApiError from '../utils/api-error.util';
 
 function errorMiddleware(err: Error, req: Request, res: Response, next: NextFunction) {
   if (err instanceof ApiError) {

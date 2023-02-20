@@ -7,7 +7,13 @@
   "overrides": [
     {
       "extends": ["airbnb-typescript/base"],
-      "files": ["*.ts", "*.tsx"]
+      "files": ["*.ts"],
+      "rules": {
+        "linebreak-style": "off",
+        "class-methods-use-this": "off",
+        "import/prefer-default-export": "off",
+        "@typescript-eslint/no-unused-vars": "off"
+      }
     },
     {
       "files": ["*-const.ts"],
@@ -21,10 +27,5 @@
     "ecmaVersion": "latest",
     "sourceType": "module",
     "project": "tsconfig.json"
-  },
-  "rules": {
-    "linebreak-style": "off",
-    "class-methods-use-this": "off",
-    "import/prefer-default-export": "off"
   }
 }

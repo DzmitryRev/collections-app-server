@@ -1,11 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import errorMiddleware from './middlewares/error.middleware';
-import authRouter from './routers/auth.routers';
+import rootRouter from './routers/index.router';
 
 mongoose.set('strictQuery', false);
 
@@ -20,7 +19,7 @@ app.use(
   }),
 );
 
-app.use('/api', authRouter);
+app.use('/api', rootRouter);
 app.use(errorMiddleware);
 
 const port = process.env.PORT || 3030;
