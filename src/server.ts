@@ -3,6 +3,7 @@ import cors from 'cors';
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+import ImageKit from 'imagekit';
 import errorMiddleware from './middlewares/error.middleware';
 import rootRouter from './routers/index.router';
 
@@ -18,6 +19,17 @@ app.use(
     origin: process.env.CLIENT_URL,
   }),
 );
+
+const imagekit = new ImageKit({
+  urlEndpoint: 'https://ik.imagekit.io/z9fccliqp',
+  publicKey: 'public_ipDB1WrRO/JZRetNVHod6neqcI4=',
+  privateKey: 'private_lcfT9k5GAyT6/TCDTxJpQNLW2as=',
+});
+
+app.get('/api/imagekit-auth', (req, res) => {
+  const result = imagekit.getAuthenticationParameters();
+  res.send(result);
+});
 
 app.use('/api', rootRouter);
 app.use(errorMiddleware);

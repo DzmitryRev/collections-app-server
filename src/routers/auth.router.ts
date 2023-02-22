@@ -2,11 +2,11 @@ import { Router } from 'express';
 import {
   login,
   logout,
-  register,
-  verifyEmail,
+  confirmEmail,
   refreshTokens,
-  checkAccessToChangingPassword,
-  confirmNewPassword,
+  sendNewPassword,
+  registration,
+  changePassword,
 } from '../controllers/auth.controller';
 import {
   validateLogin,
@@ -16,12 +16,12 @@ import {
 
 const authRouter = Router();
 
-authRouter.post('/registration', validateRegister, register);
+authRouter.post('/registration', validateRegister, registration);
 authRouter.post('/login', validateLogin, login);
 authRouter.post('/logout', logout);
 authRouter.get('/refresh', refreshTokens);
-authRouter.get('/activate/:token', verifyEmail);
-authRouter.post('/resetPassword', validateResetPassword, checkAccessToChangingPassword);
-authRouter.get('/resetPassword/:token', confirmNewPassword);
+authRouter.get('/activate/:token', confirmEmail);
+authRouter.post('/resetPassword', validateResetPassword, sendNewPassword);
+authRouter.get('/resetPassword/:token', changePassword);
 
 export default authRouter;

@@ -9,14 +9,7 @@ import {
   VALIDATION_ERROR,
 } from '../constants/errors.const';
 import ApiError from '../utils/api-error.util';
-
-const validateRequest = (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req);
-  if (errors && !errors.isEmpty()) {
-    next(ApiError.badRequest(VALIDATION_ERROR, errors.array()));
-  }
-  next();
-};
+import { validateRequest } from './validationRequest';
 
 export const validateLogin = [
   check('email')

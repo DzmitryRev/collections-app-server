@@ -38,4 +38,4 @@ class MailService {
   }
 }
 
-export const MailServiceInstance = new MailService();
+export default new MailService();

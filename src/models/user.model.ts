@@ -3,23 +3,22 @@ import {
 } from 'mongoose';
 
 export type UserType = {
-  photo: string;
+  avatar: string;
   name: string;
   email: string;
   password: string;
   about: string;
   isConfirmed: boolean;
-  //   activationLink: string;
   isBlocked: boolean;
   isAdmin: boolean;
 };
 
 export type UserDtoType = { id: string } & Pick<
 UserType,
-'name' | 'about' | 'photo' | 'email' | 'isAdmin' | 'isBlocked' | 'isConfirmed'
+'name' | 'about' | 'avatar' | 'email' | 'isAdmin' | 'isBlocked' | 'isConfirmed'
 >;
 
-type UserMethodsType = {
+export type UserMethodsType = {
   transform(): UserDtoType;
 } & UserType &
 Document;
@@ -35,10 +34,9 @@ const userSchema = new Schema<UserType, UserModelType, UserMethodsType>({
   },
   name: { type: String, required: true, trim: true },
   password: { type: String, required: true, minlength: 6 },
-  photo: { type: String, default: null },
+  avatar: { type: String, default: '' },
   about: { type: String, default: '' },
   isConfirmed: { type: Boolean, default: false },
-  //   activationLink: { type: String },
   isBlocked: { type: Boolean, default: false },
   isAdmin: { type: Boolean, default: false },
 });
@@ -48,7 +46,7 @@ userSchema.methods.transform = function transform() {
     id: this.id as string,
     name: this.name,
     email: this.email,
-    photo: this.photo,
+    avatar: this.avatar,
     about: this.about,
     isConfirmed: this.isConfirmed,
     isBlocked: this.isBlocked,

@@ -14,3 +14,4 @@ export const INVALID_LINK = 'Invalid link';
 export const USER_UNAUTH = 'User unauthorized';
 export const VERIFICATION_FAILED = 'Email verification failed';
 export const USER_ALREADY_LOGGED_OUT = 'User already logged out';
+export const HAVENT_ACCESS = 'Have not access';
