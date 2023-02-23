@@ -39,7 +39,7 @@ export const registration = async (
 
 export const login = async (
   req: Request<{}, {}, { email: string; password: string }>,
-  res: Response<{ user: UserDtoType; accessToken: string }>,
+  res: Response<{ userId: string; isAdmin: boolean; accessToken: string }>,
   next: NextFunction,
 ) => {
   try {
@@ -49,7 +49,11 @@ export const login = async (
       maxAge: COOKIE_AGE,
       httpOnly: true,
     });
-    res.send({ user: userAndTokens.user, accessToken: userAndTokens.accessToken });
+    res.send({
+      userId: userAndTokens.user.id,
+      isAdmin: userAndTokens.user.isAdmin,
+      accessToken: userAndTokens.accessToken,
+    });
   } catch (e) {
     next(e);
   }
@@ -67,7 +71,7 @@ export const logout = async (req: Request, res: Response<SuccessMessage>, next: 
 
 export const refreshTokens = async (
   req: Request,
-  res: Response<{ user: UserDtoType; accessToken: string }>,
+  res: Response<{ userId: string; isAdmin: boolean; accessToken: string }>,
   next: NextFunction,
 ) => {
   try {
@@ -77,7 +81,11 @@ export const refreshTokens = async (
       maxAge: COOKIE_AGE,
       httpOnly: true,
     });
-    res.json({ user: userAndTokens.user, accessToken: userAndTokens.accessToken });
+    res.send({
+      userId: userAndTokens.user.id,
+      isAdmin: userAndTokens.user.isAdmin,
+      accessToken: userAndTokens.accessToken,
+    });
   } catch (e) {
     next(e);
   }

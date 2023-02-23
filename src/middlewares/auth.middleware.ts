@@ -30,6 +30,7 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
     }
     const userDto = userData.payload as UserDtoType;
     const user = await userService.getUserById(userDto.id);
+
     if (user.isBlocked) {
       res.clearCookie(REFRESH_COOKIE_NAME);
       return next(new ApiError(USER_UNAUTH, httpStatus.UNAUTHORIZED));
