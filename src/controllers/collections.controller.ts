@@ -71,12 +71,12 @@ export const getCollectionItems = async (
 
 export const searchCollectionItems = async (
   req: Request,
-  res: Response<{ items: ICollectionItem[] }>,
+  res: Response<{ items: null }>,
   next: NextFunction,
 ) => {
   try {
-    const collectionItems = await collectionService.searchCollectionItems('latte');
-    res.json({ items: collectionItems });
+    // const collectionItems = await collectionService.searchCollectionItems('latte');
+    res.json({ items: null });
   } catch (e) {
     next(e);
   }
