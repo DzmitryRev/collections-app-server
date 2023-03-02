@@ -11,7 +11,6 @@ import {
   PASSWORD_CHANGED,
   SUCCESS_CONFIRM_URL,
 } from '../constants/client-paths.const';
-import { UserDtoType } from '../models/user.model';
 import SuccessMessage from '../utils/success-message.util';
 import {
   confirmEmailCase,

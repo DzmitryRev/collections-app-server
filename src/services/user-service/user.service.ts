@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import { UpdateQuery } from 'mongoose';
 import {
   INVALID_LINK,
   INVALID_PASSWORD,
@@ -8,7 +7,7 @@ import {
   USER_NOT_CONFIRMED,
   USER_NOT_FOUND,
 } from '../../constants/errors.const';
-import UserModel, { UserDtoType, UserMethodsType } from '../../models/user.model';
+import UserModel, { IUser } from '../../models/user.model';
 import ApiError from '../../utils/api-error.util';
 
 class UserService {
@@ -21,7 +20,13 @@ class UserService {
       password: hashedPassword,
     });
     const savedUser = await newUser.save();
-    return savedUser;
+    return savedUser.transform();
+  }
+
+  async getUserProfile(userId: string) {
+    const user = await UserModel.getUserById(userId);
+    if (!user) throw ApiError.badRequest(USER_NOT_FOUND);
+    return user.transform();
   }
 
   async checkAccessToLogin(email: string) {
@@ -37,33 +42,19 @@ class UserService {
     if (!isPassEquals) throw ApiError.badRequest(INVALID_PASSWORD);
   }
 
-  async getUserById(id: string) {
-    const user = await UserModel.findById(id).catch(() => {
-      throw ApiError.badRequest(USER_NOT_FOUND);
-    });
+  async confirmUserEmail(userId: string) {
+    const user = await UserModel.getUserById(userId);
     if (!user) throw ApiError.badRequest(USER_NOT_FOUND);
-    return user;
-  }
-
-  async findAndUpdateById(id: string, body: Partial<UserDtoType>) {
-    const user = await UserModel.findByIdAndUpdate(id, body).catch(() => {
-      throw ApiError.badRequest(USER_NOT_FOUND);
-    });
-    if (!user) throw ApiError.badRequest(USER_NOT_FOUND);
-    return user;
-  }
-
-  async confirmUserEmail(id: string) {
-    const user = await this.getUserById(id);
     if (user.isConfirmed) throw ApiError.badRequest(INVALID_LINK);
     user.isConfirmed = true;
     await user.save();
+    return user.transform();
   }
 
-  async updateUserById(id: string, filter: UpdateQuery<UserMethodsType>) {
-    const user = await UserModel.findByIdAndUpdate(id, { ...filter }, { new: true });
+  async updateUser(userId: string, body: Partial<IUser>) {
+    const user = await UserModel.getUserByIdAndUpdate(userId, body);
     if (!user) throw ApiError.badRequest(USER_NOT_FOUND);
-    return user;
+    return user.transform();
   }
 }
 

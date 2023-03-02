@@ -10,9 +10,7 @@ export async function updatePasswordCase(passwordToken: string) {
   );
   const newHashedPassword = await bcrypt.hash(refreshTokenDoc.payload.newPassword as string, 3);
 
-  await userService.updateUserById((refreshTokenDoc.payload.user as UserDtoType).id, {
-    $set: {
-      password: newHashedPassword,
-    },
+  await userService.updateUser((refreshTokenDoc.payload.user as UserDtoType).id, {
+    password: newHashedPassword,
   });
 }

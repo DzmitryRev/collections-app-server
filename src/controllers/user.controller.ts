@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
+import { NO_ACCESS } from '../constants/errors.const';
 import { UserDtoType } from '../models/user.model';
-import { getUserProfileCase, updateUserCase } from '../use-cases/profile';
+import userService from '../services/user-service/user.service';
+import ApiError from '../utils/api-error.util';
 
 export const getUserProfile = async (
   req: Request<{ userId: string }>,
@@ -9,7 +11,7 @@ export const getUserProfile = async (
 ) => {
   try {
     const { userId } = req.params;
-    const user = await getUserProfileCase(userId);
+    const user = await userService.getUserProfile(userId);
     res.json(user);
   } catch (e) {
     next(e);
@@ -22,20 +24,10 @@ export const updateUserBody = async (
   next: NextFunction,
 ) => {
   try {
-    const user = await updateUserCase(req.params.userId, req.body);
-    res.json(user);
-  } catch (e) {
-    next(e);
-  }
-};
-
-export const updateUserAvatar = async (
-  req: Request<{ userId: string }, {}, Pick<UserDtoType, 'avatar'>>,
-  res: Response<UserDtoType>,
-  next: NextFunction,
-) => {
-  try {
-    const user = await updateUserCase(req.params.userId, req.body);
+    if (req.body?.email) {
+      throw ApiError.badRequest(NO_ACCESS);
+    }
+    const user = await userService.updateUser(req.params.userId, req.body);
     res.json(user);
   } catch (e) {
     next(e);

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getUserProfile, updateUserAvatar, updateUserBody } from '../controllers/user.controller';
+import { getUserProfile, updateUserBody } from '../controllers/user.controller';
 import { adminMiddleware } from '../middlewares/admin.middleware';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { ownerMiddleware } from '../middlewares/owner.middleware';
@@ -15,13 +15,7 @@ profileRouter.put(
   validateUpdateUserBody,
   updateUserBody,
 );
-profileRouter.put('/settings/avatar/:userId', authMiddleware, ownerMiddleware, updateUserAvatar);
-profileRouter.put(
-  '/settings/toggle-block/:userId',
-  authMiddleware,
-  adminMiddleware,
-  updateUserBody,
-);
-profileRouter.put('/settings/make-admin/:userId', authMiddleware, adminMiddleware, updateUserBody);
+
+profileRouter.put('/settings/admin/:userId', authMiddleware, adminMiddleware, updateUserBody);
 
 export default profileRouter;

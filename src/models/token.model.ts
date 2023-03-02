@@ -1,8 +1,7 @@
-import { Schema, model } from 'mongoose';
-import { UserType } from './user.model';
+import { Schema, model, Types } from 'mongoose';
 
 export type TokenType = {
-  user: UserType;
+  user: Types.ObjectId;
   refreshToken: string;
 };
 

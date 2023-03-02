@@ -16,7 +16,7 @@ class MailService {
 
   async sendEmail(to: string, subject: string, html: string) {
     await this.transporter.sendMail({
-      from: 'Collectory',
+      from: process.env.GMAIL_USER,
       to,
       subject,
       html,

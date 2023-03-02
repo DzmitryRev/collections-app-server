@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { USER_ALREADY_LOGGED_OUT, USER_UNAUTH } from '../constants/errors.const';
+import { USER_ALREADY_LOGGED_OUT, UNAUTHORIZED } from '../constants/errors.const';
 import TokenModel from '../models/token.model';
 
 import { UserDtoType } from '../models/user.model';
@@ -35,13 +35,13 @@ class TokenService {
 
   async getToken(token: string) {
     const tokenInDb = await TokenModel.findOne({ refreshToken: token });
-    if (!tokenInDb) throw new ApiError(USER_UNAUTH, httpStatus.UNAUTHORIZED);
+    if (!tokenInDb) throw new ApiError(UNAUTHORIZED, httpStatus.UNAUTHORIZED);
     return tokenInDb;
   }
 
   validateToken(token: string, secret: string) {
     const tokenDoc = jwt.verify(token, secret);
-    if (!tokenDoc) throw new ApiError(USER_UNAUTH, httpStatus.UNAUTHORIZED);
+    if (!tokenDoc) throw new ApiError(UNAUTHORIZED, httpStatus.UNAUTHORIZED);
     return tokenDoc as JwtPayload;
   }
 
