@@ -35,6 +35,7 @@ export interface ICollection {
   description: string;
   theme: AvailableCollectionsThemes;
   photo: string;
+  creationDate: String;
   requiredFields: AnyFieldType[];
   customFields: AnyFieldType[];
 }
@@ -45,6 +46,7 @@ export type CollectionDtoType = {
   description: string;
   theme: AvailableCollectionsThemes;
   photo: string;
+  creationDate: String;
   requiredFields: AnyFieldType[];
   customFields: AnyFieldType[];
 };
@@ -77,6 +79,7 @@ const collectionSchema = new Schema<ICollection, CollectionModel, ICollectionMet
   photo: { type: String, default: '' },
   requiredFields: { type: [Object], default: REQUIRED_FIELDS },
   customFields: { type: [Object], default: [] },
+  creationDate: { type: String, default: new Date().toLocaleDateString() },
 });
 
 collectionSchema.virtual('id').get(function () {

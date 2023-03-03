@@ -5,7 +5,7 @@ import { AVAILABLE_THEMES, CollectionDtoType, ICollection } from '../models/coll
 import collectionService, {
   AddCollectionBodyType,
 } from '../services/collection-service/collection.service';
-import { getUserCollectionsCase } from '../use-cases/collection';
+import { getNewCollectionsCase, getUserCollectionsCase } from '../use-cases/collection';
 
 type UserCollectionsResType = {
   collections: Pick<FlattenMaps<LeanDocument<ICollection>>, 'name' | 'photo' | 'theme'>[];
@@ -41,6 +41,19 @@ export const getUserCollections = async (
   }
 };
 
+export const getNewCollections = async (
+  req: Request,
+  res: Response<{ collections: FlattenMaps<LeanDocument<ICollection>>[] }>,
+  next: NextFunction,
+) => {
+  try {
+    const collections = await getNewCollectionsCase();
+    res.json({ collections });
+  } catch (e) {
+    next(e);
+  }
+};
+
 export const getCollection = async (
   req: Request<{ collectionId: string }>,
   res: Response<CollectionResType>,
@@ -70,13 +83,13 @@ export const getCollectionItems = async (
 };
 
 export const searchCollectionItems = async (
-  req: Request,
-  res: Response<{ items: null }>,
+  req: Request<{}, {}, {}, { value: string }>,
+  res: Response<{ items: ICollectionItem[] }>,
   next: NextFunction,
 ) => {
   try {
-    // const collectionItems = await collectionService.searchCollectionItems('latte');
-    res.json({ items: null });
+    const collectionItems = await collectionService.searchCollectionItems(req.query.value);
+    res.json({ items: collectionItems });
   } catch (e) {
     next(e);
   }

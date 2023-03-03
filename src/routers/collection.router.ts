@@ -8,14 +8,16 @@ import {
   getCollection,
   getCollectionItem,
   getCollectionItems,
+  getNewCollections,
   getUserCollections,
   searchCollectionItems,
+  //   searchCollectionItems,
   toggleLikeCollectionItem,
   updateCollection,
   updateCollectionItem,
 } from '../controllers/collections.controller';
+import { adminOrOwnerMiddleware } from '../middlewares/admin-or-owner.middleware';
 import { authMiddleware } from '../middlewares/auth.middleware';
-import { ownerMiddleware } from '../middlewares/owner.middleware';
 import {
   validateCreateCollectionBody,
   validateUpdateCollectionBody,
@@ -26,25 +28,26 @@ const collectionRouter = Router();
 collectionRouter.get('/collections-themes', getAvailableThemes);
 
 collectionRouter.get('/user/:userId/collections', getUserCollections);
+collectionRouter.get('/collections/new', getNewCollections);
 collectionRouter.get('/collections/:collectionId', getCollection);
 collectionRouter.post(
   '/user/:userId/collections',
   authMiddleware,
-  ownerMiddleware,
+  adminOrOwnerMiddleware,
   validateCreateCollectionBody,
   addCollection,
 );
 collectionRouter.put(
   '/user/:userId/collections/:collectionId',
   authMiddleware,
-  ownerMiddleware,
+  adminOrOwnerMiddleware,
   validateUpdateCollectionBody,
   updateCollection,
 );
 collectionRouter.delete(
   '/user/:userId/collections/delete',
   authMiddleware,
-  ownerMiddleware,
+  adminOrOwnerMiddleware,
   deleteCollections,
 );
 
@@ -55,14 +58,14 @@ collectionRouter.get('/search-items', searchCollectionItems);
 collectionRouter.post(
   '/user/:userId/collections/:collectionId',
   authMiddleware,
-  ownerMiddleware,
+  adminOrOwnerMiddleware,
   addCollectionItem,
 );
 
 collectionRouter.put(
   '/user/:userId/collection/update/:collectionItemId',
   authMiddleware,
-  ownerMiddleware,
+  adminOrOwnerMiddleware,
   updateCollectionItem,
 );
 
@@ -75,7 +78,7 @@ collectionRouter.put(
 collectionRouter.delete(
   '/user/:userId/collection-items/delete',
   authMiddleware,
-  ownerMiddleware,
+  adminOrOwnerMiddleware,
   deleteCollectionItems,
 );
 

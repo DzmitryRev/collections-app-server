@@ -79,12 +79,12 @@ class CollectionService {
     return collectionItems.map((item) => item.toJSON());
   }
 
-  //   async searchCollectionItems(value: string) {
-  //     const collectionItems = await CollectionItemModel.find({
-  //       $text: { $search: value },
-  //     });
-  //     return collectionItems.map((item) => item.toJSON());
-  //   }
+  async searchCollectionItems(value: string) {
+    const collectionItems = await CollectionItemModel.find({
+      $text: { $search: value },
+    });
+    return collectionItems.map((item) => item.toJSON());
+  }
 
   async addCollectionItem(
     collectionId: string,
